@@ -29,6 +29,20 @@ const initialState: ActivityState = {
   activities: {},
 };
 
+/**
+ * Dispatches a resize event so the content adjusts, after a 200ms delay for animations.
+ */
+function dispatchResizeAfterAnimation() {
+  setTimeout(() => {
+    // The timer can outlive the page, e.g. when a test environment is torn down
+    // before it fires. Then `window` is not defined at all, and `window?.` would
+    // still throw a ReferenceError, so check with typeof.
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new Event('resize'));
+    }
+  }, 200);
+}
+
 export const activitySlice = createSlice({
   name: 'activity',
   initialState,
@@ -75,11 +89,7 @@ export const activitySlice = createSlice({
         };
       }
 
-      // Dispatch resize event so the content adjusts
-      // 200ms delay for animations
-      setTimeout(() => {
-        window?.dispatchEvent?.(new Event('resize'));
-      }, 200);
+      dispatchResizeAfterAnimation();
     },
     close(state, action: PayloadAction<string>) {
       // Remove the activity from history
@@ -113,11 +123,7 @@ export const activitySlice = createSlice({
         ...action.payload,
       };
 
-      // Dispatch resize event so the content adjusts
-      // 200ms delay for animations
-      setTimeout(() => {
-        window?.dispatchEvent?.(new Event('resize'));
-      }, 200);
+      dispatchResizeAfterAnimation();
     },
     reset() {
       return initialState;
